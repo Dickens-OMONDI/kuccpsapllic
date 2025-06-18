@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KUCCPS Application Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    .form-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 500px;
+    }
+    .form-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .form-box button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    #countdown {
+      font-weight: bold;
+      color: red;
+      margin-bottom: 15px;
+      display: block;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box" id="login-form">
+    <h2>KUCCPS Login</h2>
+    <p style="text-align: center;">Registration closses in:<span id="countdown"></span></p>
+    <input type="text" id="name" placeholder="Enter Full Name" />
+    <input type="text" id="year" placeholder="KCSE Year (e.g. 2023)" />
+    <input type="password" id="password" placeholder="Enter Password" />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div class="form-box hidden" id="form-container"></div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+   const deadline = new Date("June 30, 2025 23:59:59").getTime();
+   const countdownEl = document.getElementById("countdown");
+    const formContainer = document.getElementById("form-container");
+    let currentForm = 1;
+    const totalForms = 5;
+    let loggedInUser = { name: "", year: "" };
+
+    const users = [
+      { name: "Faith Achieng", year: "2023", password: "ach123" },
+      { name: "John Otieno", year: "2022", password: "john2022" },
+      { name: "Mercy Mwangi", year: "2021", password: "mercyM" },
+      { name: "Kevin Kiptoo", year: "2022", password: "kkip" },
+      { name: "Lilian Wanjiru", year: "2023", password: "lily23" },
+      { name: "Brian Ouma", year: "2021", password: "brian321" },
+      { name: "Daisy Naliaka", year: "2020", password: "daisyN" },
+      { name: "George Kariuki", year: "2022", password: "gkariuki" },
+      { name: "Sharon Njeri", year: "2023", password: "shazzy" },
+      { name: "Patrick Odhiambo", year: "2021", password: "pato21" }
+    ];
+    // Countdown timer
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const remaining = deadline - now;
+
+      if (remaining <= 0) {
+        countdownEl.innerText = "Registration Closed";
+        return;
+      }
+
+      const d = Math.floor(remaining / (1000 * 60 * 60 * 24));
+      const h = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((remaining % (1000 * 60)) / 1000);
+      countdownEl.innerText = `${d}d ${h}h ${m}m ${s}`;
+   }
+
+    // Call timer immediately on load
+    updateCountdown();
+    // Keep updating every second
+    setInterval(updateCountdown, 1000);
+
+    window.login = function () {
+      if (new Date().getTime() > deadline) {
+        alert("Registration period has ended. You cannot log in.");
+        return;
+      }
+
+      const name = document.getElementById("name").value.trim();
+      const year = document.getElementById("year").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      const found = users.find(u =>
+        u.name.toLowerCase() === name.toLowerCase() &&
+        u.year === year &&
+        u.password === password
+      );
+
+      if (found) {
+        loggedInUser = { name, year };
+        document.getElementById("login-form").classList.add("hidden");
+        loadForm(1);
+      } else {
+        alert("Invalid credentials");
+      }
+    };
+
+    window.loadForm = function (formNum) {
+      formContainer.innerHTML = `<h2>Form ${formNum} of ${totalForms}</h2>`;
+      for (let i = 1; i <= 15; i++) {
+        const qNum = (formNum - 1) * 15 + i;
+        formContainer.innerHTML += `
+          <label>Q${qNum}: Question ${qNum}?</label>
+          <input type="text" id="q${qNum}">
+        `;
+      }
+
+      const nextBtn = formNum < totalForms
+        ? `<button onclick="nextForm()">Next</button>`
+        : `<button onclick="submitSurvey()">Submit Application</button>`;
+      formContainer.innerHTML += nextBtn;
+      formContainer.classList.remove("hidden");
+    };
+
+    window.nextForm = function () {
+      currentForm++;
+      loadForm(currentForm);
+    };
+
+    window.submitSurvey = function () {
+      const answers = {};
+      for (let i = 1; i <= totalForms * 15; i++) {
+        answers[`q${i}`] = document.getElementById(`q${i}`).value;
+      }
+
+      const payload = {
+        name: loggedInUser.name,
+        year: loggedInUser.year,
+        ...answers
+     };
+
+      fetch("https://script.google.com/macros/s/AKfycbzVpDbU0fsLzcuKJ_1OpCXDEyaE5ZgZTSFX-MbaHeAeQnGDv0j9-s3bYv1BGxl6Im0/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      alert("Your application has been submitted successfully.");
+      location.reload();
+    };
+  });
+  </script>
+</body>
+</html>
