@@ -72,7 +72,7 @@
 
   <script>
   document.addEventListener("DOMContentLoaded", function () {
-   const deadline = new Date("June 6, 2025 23:59:59").getTime();
+   const deadline = new Date("June 25, 2025 23:59:59").getTime();
    const countdownEl = document.getElementById("countdown");
     const formContainer = document.getElementById("form-container");
     let currentForm = 1;
@@ -140,11 +140,36 @@
 
     window.loadForm = function (formNum) {
       formContainer.innerHTML = `<h2>Form ${formNum} of ${totalForms}</h2>`;
-      for (let i = 1; i <= 15; i++) {
-        const qNum = (formNum - 1) * 15 + i;
+      if (formNum === 1 ) {
         formContainer.innerHTML += `
-          <label>Q${qNum}: Question ${qNum}?</label>
-          <input type="text" id="q${qNum}">
+        <label>1. what is your first name? </label>
+        <input type="text" id="q1" required>
+
+        <label>2. what is your middle name name? </label>
+        <input type="text" id="q2" required>
+
+        <label>3. what is your last name? </label>
+        <input type="text" id="q3" required>
+
+        <label>4.what is your gender? </label>
+        <select id="q4" required>
+        <option value="">--Select Gender ? </label>
+        <option value="Male"> Male </option>
+        <option value="Female"> Female </option>
+        <option value="Other"> Other </option>
+        </select>
+
+        <label>5. what is your date of birth? </label>
+        <input type="date" id="q5" required>
+
+        <label>6. what is your ID number? </label>
+        <input type="text" id="q6" required>
+
+        <label>7. marital status? </label>
+        <input type="checkbox" name"q7" value="single"> single
+        <input type="checkbox" name"q7" value="married"> married
+        <input type="checkbox" name"q7" value="divoced"> divoced
+        <input type="checkbox" name"q7" value="widower"> widower
         `;
       }
 
